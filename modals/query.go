@@ -7,6 +7,7 @@ type Req struct {
 	ChatKick       *UserQuery    `json:"kick_user"`
 	GetUser        uint64        `json:"get_user"`
 	GetChat        uint64        `json:"get_chat"`
+	GetSelf        uint64        `json:"get_self"`
 	LeaveChat      uint64        `json:"leave_chat"`
 	ForwardMessage *ForwardQuery `json:"forward"`
 	//Forward *msgService.ForwardQuery  `json:"forward"`

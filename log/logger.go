@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"gRMS-client/data"
 	"gRMS-client/modals"
+	"log"
 	"strings"
 )
+
+var Prompt string = "~"
 
 type ChatLogger interface {
 	StartLogging()
@@ -21,39 +24,58 @@ type MyChatLogger struct {
 
 func NewChatLogger(data data.DataHandler) ChatLogger {
 	return &MyChatLogger{
-		Messages: make(chan *modals.Message),
-		NewChat:  make(chan *modals.Chat),
+		Messages: make(chan *modals.Message, 100),
+		NewChat:  make(chan *modals.Chat, 20),
 		Data:     data,
 	}
 }
 
 func (c *MyChatLogger) StartLogging() {
-	select {
-	case m := <-c.Messages:
-		var sbuilder = strings.Builder{}
+	for {
+		select {
+		case m := <-c.Messages:
+			if m == nil {
+				log.Fatalln("message is nil")
+			}
+			var sbuilder = strings.Builder{}
 
-		sbuilder.WriteString(fmt.Sprintf("[%d] %s@%s >>", m.ID,
-			c.Data.GetUser(m.From).Username, c.Data.GetChat(m.Chat).Title))
+			from := c.Data.GetUser(m.From)
+			if from == nil {
+				from = &modals.User{Username: "unknown"}
+			}
+			chat := c.Data.GetChat(m.Chat)
+			if chat == nil {
+				chat = &modals.Chat{Title: "unknown"}
+			}
 
-		switch {
-		case m.Text != nil:
-			sbuilder.WriteString(fmt.Sprintf(" %s ", *m.Text))
-		case m.Photo != 0:
-			sbuilder.WriteString(fmt.Sprintf(" photo(id:%d) ", m.Photo))
-		case m.Video != 0:
-			sbuilder.WriteString(fmt.Sprintf(" video(id:%d) ", m.Video))
-		case m.Document != 0:
-			sbuilder.WriteString(fmt.Sprintf(" document(id:%d) ", m.Document))
-		case m.Audio != 0:
-			sbuilder.WriteString(fmt.Sprintf(" audio(id:%d) ", m.Audio))
-		case m.Animation != 0:
-			sbuilder.WriteString(fmt.Sprintf(" animation(id:%d) ", m.Animation))
+			fmt.Print("\033[A\n")
+			sbuilder.WriteString(fmt.Sprintf("[%d] %s @ %s >>", m.ID,
+				from.Username, chat.Title))
+
+			switch {
+			case m.Text != nil:
+				sbuilder.WriteString(fmt.Sprintf(" %s ", *m.Text))
+			case m.Photo != 0:
+				sbuilder.WriteString(fmt.Sprintf(" photo(id:%d) ", m.Photo))
+			case m.Video != 0:
+				sbuilder.WriteString(fmt.Sprintf(" video(id:%d) ", m.Video))
+			case m.Document != 0:
+				sbuilder.WriteString(fmt.Sprintf(" document(id:%d) ", m.Document))
+			case m.Audio != 0:
+				sbuilder.WriteString(fmt.Sprintf(" audio(id:%d) ", m.Audio))
+			case m.Animation != 0:
+				sbuilder.WriteString(fmt.Sprintf(" animation(id:%d) ", m.Animation))
+			}
+
+			fmt.Print(sbuilder.String())
+			fmt.Printf("\n%s> ", Prompt)
+
+		case c := <-c.NewChat:
+			if c == nil {
+				log.Fatalln("chat is nil")
+			}
+			fmt.Printf("New Chat: [%d] %s\n", c.ID, c.Title)
 		}
-
-		fmt.Println(sbuilder)
-
-	case c := <-c.NewChat:
-		fmt.Printf("New Chat: [%d] %s\n", c.ID, c.Title)
 	}
 }
 

@@ -21,6 +21,7 @@ type Client interface {
 	LeaveChat(chatId uint64) error // Leave chat should not work in dms
 	GetChat(chatId uint64) error
 	GetUser(userId uint64) error
+	GetSelf() error
 	GetUpdatesChan() chan modals.Update
 	ChangePassword()
 	ChangeUsername()
@@ -46,20 +47,28 @@ func (c *MyClient) Connect(host, path string) (err error) {
 	URL := url.URL{Scheme: "ws", Host: "localhost:8080", Path: "ws",
 		RawQuery: fmt.Sprintf("username=%s&password=%s", c.Username, c.Password)}
 	c.Conn, _, err = websocket.DefaultDialer.Dial(URL.String(), nil)
-	go func() {
+	if err != nil {
+		return
+	}
+
+	for {
 		var up modals.Update
-		for {
-			err := c.Conn.ReadJSON(&up)
-			if err != nil {
-				log.Println(err)
-				break
-			}
-			c.Updates <- up
+		err := c.Conn.ReadJSON(&up)
+		if err != nil {
+			log.Println("an error occurred", err)
+			return err
 		}
-	}()
-	return
+		c.Updates <- up
+	}
 }
 
 func (c *MyClient) GetUpdatesChan() chan modals.Update {
 	return c.Updates
+}
+
+func (c *MyClient) GetSelf() error {
+	var req = modals.Req{
+		GetSelf: 1,
+	}
+	return c.Conn.WriteJSON(req)
 }

@@ -1,2 +1,2 @@
 # gRMS-client
-CLI client of gRMS made completely in Golang
+CLI client of [gRMS](https://github.com/veryshyjelly/gRMS) made completely in Golang
