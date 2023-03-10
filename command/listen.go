@@ -54,7 +54,7 @@ func Listen(c client.Client, d data.DataHandler) {
 			if chat := d.GetChat(chatID); chat != nil {
 				logger.Prompt = blue.Sprint("(" + chat.Title + ")")
 				for {
-					fmt.Printf("(%s)> ", chat.Title)
+					fmt.Printf("%s> ", logger.Prompt)
 					text := GetString(reader)
 					if text == "" {
 						continue
