@@ -33,6 +33,8 @@ func (h *UpdatesHandler) Start() {
 			h.Data.SetUser(u.User)
 		case u.Self != nil:
 			h.Data.SetSelf(u.Self)
+		case u.Error != "":
+			h.Logger.LogError() <- u.Error
 		}
 	}
 }

@@ -14,11 +14,13 @@ type ChatLogger interface {
 	StartLogging()
 	LogMessage() chan *modals.Message
 	LogNewChat() chan *modals.Chat
+	LogError() chan string
 }
 
 type MyChatLogger struct {
 	Messages chan *modals.Message
 	NewChat  chan *modals.Chat
+	Error    chan string
 	Data     data.DataHandler
 }
 
@@ -26,12 +28,14 @@ func NewChatLogger(data data.DataHandler) ChatLogger {
 	return &MyChatLogger{
 		Messages: make(chan *modals.Message, 100),
 		NewChat:  make(chan *modals.Chat, 20),
+		Error:    make(chan string, 10),
 		Data:     data,
 	}
 }
 
 func (c *MyChatLogger) StartLogging() {
 	for {
+		fmt.Print("\033[A\n")
 		select {
 		case m := <-c.Messages:
 			if m == nil {
@@ -48,7 +52,6 @@ func (c *MyChatLogger) StartLogging() {
 				chat = &modals.Chat{Title: "unknown"}
 			}
 
-			fmt.Print("\033[A\n")
 			sbuilder.WriteString(fmt.Sprintf("[%d] %s @ %s >>", m.ID,
 				from.Username, chat.Title))
 
@@ -68,14 +71,17 @@ func (c *MyChatLogger) StartLogging() {
 			}
 
 			fmt.Print(sbuilder.String())
-			fmt.Printf("\n%s> ", Prompt)
 
 		case c := <-c.NewChat:
 			if c == nil {
 				log.Fatalln("chat is nil")
 			}
 			fmt.Printf("New Chat: [%d] %s\n", c.ID, c.Title)
+
+		case e := <-c.Error:
+			fmt.Printf("%v", e)
 		}
+		fmt.Printf("\n%s> ", Prompt)
 	}
 }
 
@@ -85,4 +91,8 @@ func (c *MyChatLogger) LogMessage() chan *modals.Message {
 
 func (c *MyChatLogger) LogNewChat() chan *modals.Chat {
 	return c.NewChat
+}
+
+func (c *MyChatLogger) LogError() chan string {
+	return c.Error
 }

@@ -66,7 +66,12 @@ func Listen(c client.Client, d data.DataHandler) {
 				fmt.Println("chat not found")
 			}
 		} else if s[0] == "new_chat" {
+			title := strings.Join(s[1:], " ")
+			fmt.Print("enter the usernames to add: ")
+			var usernames string
+			fmt.Scanln(&usernames)
 
+			c.CreateChat(title, strings.Split(usernames, " "))
 		}
 
 		logger.Prompt = "~"
