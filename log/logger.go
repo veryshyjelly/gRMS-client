@@ -6,6 +6,8 @@ import (
 	"gRMS-client/modals"
 	"log"
 	"strings"
+
+	"github.com/gookit/color"
 )
 
 var Prompt string = "~"
@@ -34,10 +36,15 @@ func NewChatLogger(data data.DataHandler) ChatLogger {
 }
 
 func (c *MyChatLogger) StartLogging() {
+	blue := color.FgBlue
+	yellow := color.FgYellow
+	red := color.FgRed
+	green := color.FgGreen
+
 	for {
-		fmt.Print("\033[A\n")
 		select {
 		case m := <-c.Messages:
+			fmt.Print("\033[1000D\033[K")
 			if m == nil {
 				log.Fatalln("message is nil")
 			}
@@ -52,8 +59,14 @@ func (c *MyChatLogger) StartLogging() {
 				chat = &modals.Chat{Title: "unknown"}
 			}
 
-			sbuilder.WriteString(fmt.Sprintf("[%d] %s @ %s >>", m.ID,
-				from.Username, chat.Title))
+			yellow.Printf("[%d] ", m.ID)
+			green.Light().Printf("%s", from.Username)
+			fmt.Printf(" @")
+			blue.Light().Printf("(%s)", chat.Title)
+			green.Printf(">> ")
+
+			// sbuilder.WriteString(fmt.Sprintf("[%d] %s @ %s >>", m.ID,
+			// from.Username, chat.Title))
 
 			switch {
 			case m.Text != nil:
@@ -73,13 +86,16 @@ func (c *MyChatLogger) StartLogging() {
 			fmt.Print(sbuilder.String())
 
 		case c := <-c.NewChat:
+			fmt.Print("\033[1000D\033[K")
 			if c == nil {
 				log.Fatalln("chat is nil")
 			}
-			fmt.Printf("New Chat: [%d] %s\n", c.ID, c.Title)
+			blue.Light().Printf("New Chat - %s ", c.Title)
+			fmt.Printf("(id:%d)", c.ID)
 
 		case e := <-c.Error:
-			fmt.Printf("%v", e)
+			fmt.Print("\033[1000D\033[K")
+			red.Printf("%v", e)
 		}
 		fmt.Printf("\n%s> ", Prompt)
 	}

@@ -15,13 +15,19 @@ type UpdatesHandler struct {
 func (h *UpdatesHandler) Start() {
 	for {
 		u := <-h.Updates
+
 		if u.Message != nil {
 			h.Data.SaveMessage(u.Message)
+		}
+
+		if u.Error != "" {
+			h.Logger.LogError() <- u.Error
 		}
 
 		if u.ID == 0 {
 			continue
 		}
+
 		switch {
 		case u.Message != nil:
 			h.Logger.LogMessage() <- u.Message
@@ -33,8 +39,6 @@ func (h *UpdatesHandler) Start() {
 			h.Data.SetUser(u.User)
 		case u.Self != nil:
 			h.Data.SetSelf(u.Self)
-		case u.Error != "":
-			h.Logger.LogError() <- u.Error
 		}
 	}
 }

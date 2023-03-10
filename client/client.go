@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 	"gRMS-client/modals"
-	"log"
 	"net/url"
 
 	"github.com/gorilla/websocket"
@@ -25,6 +24,7 @@ type Client interface {
 	GetUpdatesChan() chan modals.Update
 	ChangePassword()
 	ChangeUsername()
+	Close() error
 }
 
 func NewClient(username, password string) Client {
@@ -48,15 +48,15 @@ func (c *MyClient) Connect(host, path string) (err error) {
 		RawQuery: fmt.Sprintf("username=%s&password=%s", c.Username, c.Password)}
 	c.Conn, _, err = websocket.DefaultDialer.Dial(URL.String(), nil)
 	if err != nil {
-		return
+		return err
 	}
 
 	for {
 		var up modals.Update
 		err := c.Conn.ReadJSON(&up)
 		if err != nil {
-			log.Println("an error occurred", err)
-			return err
+			// log.Println("an error occurred", err)
+			return nil
 		}
 		c.Updates <- up
 	}
@@ -71,4 +71,8 @@ func (c *MyClient) GetSelf() error {
 		GetSelf: 1,
 	}
 	return c.Conn.WriteJSON(req)
+}
+
+func (c *MyClient) Close() error {
+	return c.Conn.Close()
 }
