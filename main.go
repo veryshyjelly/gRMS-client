@@ -42,7 +42,8 @@ func main() {
 		fmt.Scanln(&password)
 		fmt.Print("\033[A\033[K")
 	} else {
-		log.Fatalln("Sign Up option is not build yet.")
+		fmt.Println("Sign Up option is not build into cli yet you can go to /signup to create an account.")
+		return
 	}
 
 	c := client.NewClient(username, password)
