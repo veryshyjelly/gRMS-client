@@ -16,6 +16,8 @@ func Listen(c client.Client, d data.DataHandler) {
 	var reader = bufio.NewReader(os.Stdin)
 	yellow := color.FgYellow
 	blue := color.FgBlue
+	cyan := color.FgCyan
+	red := color.FgRed
 
 	for {
 		var command string
@@ -60,19 +62,40 @@ func Listen(c client.Client, d data.DataHandler) {
 						continue
 					}
 
-					if text == ">back" {
-						break
-					}
+					if text[0] == '>' {
+						if command := strings.Split(text[1:], " "); command[0] == "back" {
+							break
+						} else if command[0] == "add" {
+							if len(command) == 1 {
+								red.Printf("no username given -_-\n")
+								continue
+							}
 
-					c.SendMessage(chatID, strings.TrimSpace(text), 0)
+							c.AddToChat(chatID, command[1:])
+						} else if command[0] == "help" {
+							helpline := strings.Builder{}
+
+							helpline.WriteString(yellow.Sprintf(">back (go back from this chat)\n"))
+							helpline.WriteString(yellow.Sprintf(">add <list of usernames> (add users to the chat)\n"))
+							helpline.WriteString(yellow.Sprintf(">help (displays this message)\n"))
+
+							fmt.Print(helpline.String())
+						}
+
+					} else {
+						c.SendMessage(chatID, strings.TrimSpace(text), 0)
+					}
 				}
 			} else {
 				fmt.Println("chat not found")
 			}
 		} else if command == "new_chat" {
 			blue.Light().Print("Title: ")
-			title := GetString(reader)
-			fmt.Print("enter the usernames to add: ")
+			var title string
+			for title == "" {
+				title = GetString(reader)
+			}
+			cyan.Print("enter the usernames to add: ")
 			usernames := GetString(reader)
 			usernames = strings.ReplaceAll(usernames, "\n", "")
 

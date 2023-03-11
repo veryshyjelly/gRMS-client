@@ -5,12 +5,13 @@ type Req struct {
 	NewChat        *NewChatQuery `json:"new_chat"`
 	ChatJoin       *UserQuery    `json:"add_user"`
 	ChatKick       *UserQuery    `json:"kick_user"`
+	Promote        *UserQuery    `json:"promote"`
+	Demote         *UserQuery    `json:"demote"`
 	GetUser        uint64        `json:"get_user"`
 	GetChat        uint64        `json:"get_chat"`
 	GetSelf        uint64        `json:"get_self"`
 	LeaveChat      uint64        `json:"leave_chat"`
 	ForwardMessage *ForwardQuery `json:"forward"`
-	//Forward *msgService.ForwardQuery  `json:"forward"`
 }
 
 type MessQuery struct {
@@ -32,8 +33,8 @@ type NewChatQuery struct {
 }
 
 type UserQuery struct {
-	ChatID uint64 `json:"chat_id"`
-	UserID uint64 `json:"user_id"`
+	ChatID uint64   `json:"chat_id"`
+	Users  []string `json:"users"`
 }
 
 type ForwardQuery struct {
