@@ -1,6 +1,11 @@
 package modals
 
-import "time"
+import (
+	"fmt"
+	"time"
+
+	"github.com/gookit/color"
+)
 
 type Message struct {
 	// ID unique to Chat
@@ -51,4 +56,39 @@ type Message struct {
 	VideoChatStarted *bool `json:"video_chat_started,omitempty"`
 	// VideoChatEnded is service message, true when video chat is ended
 	VideoChatEnded *bool `json:"video_chat_ended,omitempty"`
+}
+
+func (m *Message) Log(chat *Chat, from *User) {
+	if from == nil {
+		from = &User{Username: "unknown"}
+	}
+	if chat == nil {
+		chat = &Chat{Title: "unknown"}
+	}
+
+	blue := color.FgBlue
+	yellow := color.FgYellow
+	green := color.FgGreen
+
+	yellow.Printf("[%d] ", m.ID)
+	green.Light().Printf("%s", from.Username)
+	blue.Light().Printf("@(%s)", chat.Title)
+	green.Printf(">> ")
+
+	switch {
+	case m.Text != nil:
+		fmt.Print(*m.Text)
+	case m.Photo != 0:
+		fmt.Printf("photo(id:%d)", m.Photo)
+	case m.Video != 0:
+		fmt.Printf("video(id:%d)", m.Video)
+	case m.Document != 0:
+		fmt.Printf("document(id:%d)", m.Document)
+	case m.Audio != 0:
+		fmt.Printf("audio(id:%d)", m.Audio)
+	case m.Animation != 0:
+		fmt.Printf("animation(id:%d)", m.Animation)
+	}
+
+	fmt.Println()
 }

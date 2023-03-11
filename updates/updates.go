@@ -15,7 +15,6 @@ type UpdatesHandler struct {
 func (h *UpdatesHandler) Start() {
 	for {
 		u := <-h.Updates
-
 		if u.Message != nil {
 			h.Data.SaveMessage(u.Message)
 		}

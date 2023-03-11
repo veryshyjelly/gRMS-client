@@ -7,6 +7,7 @@ import (
 	"gRMS-client/data"
 	logger "gRMS-client/log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gookit/color"
@@ -72,6 +73,23 @@ func Listen(c client.Client, d data.DataHandler) {
 							}
 
 							c.AddToChat(chatID, command[1:])
+						} else if command[0] == "history" {
+							mess := d.GetMessages(chatID)
+
+							var last int
+							if len(command) != 1 {
+								last, _ = strconv.Atoi(command[1])
+								if last > len(mess) {
+									last = 0
+								} else {
+									last = len(mess) - last
+								}
+							}
+
+							for _, m := range mess[last:] {
+								m.Log(chat, d.GetUser(m.From))
+							}
+
 						} else if command[0] == "help" {
 							helpline := strings.Builder{}
 
