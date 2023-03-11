@@ -44,7 +44,7 @@ type MyClient struct {
 }
 
 func (c *MyClient) Connect(host, path string) (err error) {
-	URL := url.URL{Scheme: "ws", Host: "localhost:8080", Path: "ws",
+	URL := url.URL{Scheme: "ws", Host: host, Path: "ws",
 		RawQuery: fmt.Sprintf("username=%s&password=%s", c.Username, c.Password)}
 	c.Conn, _, err = websocket.DefaultDialer.Dial(URL.String(), nil)
 	if err != nil {
