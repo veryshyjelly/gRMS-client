@@ -19,21 +19,21 @@ func (c *MyClient) CreateChat(title string, participants []string) error {
 	return c.Conn.WriteJSON(req)
 }
 
-func (c *MyClient) AddToChat(chatId uint64, userId uint64) error {
+func (c *MyClient) AddToChat(chatId uint64, usernames []string) error {
 	var req = modals.Req{
 		ChatJoin: &modals.UserQuery{
 			ChatID: chatId,
-			UserID: userId,
+			Users:  usernames,
 		},
 	}
 	return c.Conn.WriteJSON(req)
 }
 
-func (c *MyClient) RemoveFromChat(chatId uint64, userId uint64) error {
+func (c *MyClient) RemoveFromChat(chatId uint64, usernames []string) error {
 	var req = modals.Req{
 		ChatKick: &modals.UserQuery{
 			ChatID: chatId,
-			UserID: userId,
+			Users:  usernames,
 		},
 	}
 	return c.Conn.WriteJSON(req)

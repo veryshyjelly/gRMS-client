@@ -15,8 +15,8 @@ type Client interface {
 	ForwardMessage(fromChatId uint64, messId uint64, toChatId uint64) error
 	DeleteMessage(chatId uint64, messId uint64) error
 	CreateChat(title string, participants []string) error
-	AddToChat(chatId uint64, userId uint64) error
-	RemoveFromChat(chatId uint64, userId uint64) error
+	AddToChat(chatId uint64, usernames []string) error
+	RemoveFromChat(chatId uint64, usernames []string) error
 	LeaveChat(chatId uint64) error // Leave chat should not work in dms
 	GetChat(chatId uint64) error
 	GetUser(userId uint64) error
