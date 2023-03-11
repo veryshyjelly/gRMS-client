@@ -15,6 +15,7 @@ type DataHandler interface {
 	SetUser(user *modals.User)
 	SetChat(chat *modals.Chat)
 	SaveMessage(mess *modals.Message)
+	GetMessages(chatID uint64) []*modals.Message
 }
 
 type MyDataHandler struct {
@@ -93,6 +94,14 @@ func (d *MyDataHandler) SaveMessage(mess *modals.Message) {
 	} else {
 		d.Messages[mess.Chat] = []*modals.Message{mess}
 	}
+}
+
+func (d *MyDataHandler) GetMessages(chatID uint64) []*modals.Message {
+	if v, ok := d.Messages[chatID]; ok {
+		return v
+	}
+
+	return []*modals.Message{}
 }
 
 func (d *MyDataHandler) SetSelf(u *modals.User) {

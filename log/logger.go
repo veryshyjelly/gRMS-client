@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gRMS-client/data"
 	"gRMS-client/modals"
-	"log"
 
 	"github.com/gookit/color"
 )
@@ -36,63 +35,25 @@ func NewChatLogger(data data.DataHandler) ChatLogger {
 
 func (c *MyChatLogger) StartLogging() {
 	blue := color.FgBlue
-	yellow := color.FgYellow
 	red := color.FgRed
-	green := color.FgGreen
 
 	for {
 		select {
 		case m := <-c.Messages:
 			fmt.Print("\033[1000D\033[K")
-			if m == nil {
-				log.Fatalln("message is nil")
-			}
-
-			from := c.Data.GetUser(m.From)
-			if from == nil {
-				from = &modals.User{Username: "unknown"}
-			}
-			chat := c.Data.GetChat(m.Chat)
-			if chat == nil {
-				chat = &modals.Chat{Title: "unknown"}
-			}
-
-			yellow.Printf("[%d] ", m.ID)
-			green.Light().Printf("%s", from.Username)
-			blue.Light().Printf("@(%s)", chat.Title)
-			green.Printf(">> ")
-
-			// sbuilder.WriteString(fmt.Sprintf("[%d] %s @ %s >>", m.ID,
-			// from.Username, chat.Title))
-
-			switch {
-			case m.Text != nil:
-				fmt.Print(*m.Text)
-			case m.Photo != 0:
-				fmt.Printf("photo(id:%d)", m.Photo)
-			case m.Video != 0:
-				fmt.Printf("video(id:%d)", m.Video)
-			case m.Document != 0:
-				fmt.Printf("document(id:%d)", m.Document)
-			case m.Audio != 0:
-				fmt.Printf("audio(id:%d)", m.Audio)
-			case m.Animation != 0:
-				fmt.Printf("animation(id:%d)", m.Animation)
-			}
+			m.Log(c.Data.GetChat(m.Chat), c.Data.GetUser(m.From))
 
 		case c := <-c.NewChat:
 			fmt.Print("\033[1000D\033[K")
-			if c == nil {
-				log.Fatalln("chat is nil")
-			}
 			blue.Light().Printf("New Chat - %s ", c.Title)
-			fmt.Printf("(id:%d)", c.ID)
+			fmt.Printf("(id:%d)\n", c.ID)
 
 		case e := <-c.Error:
 			fmt.Print("\033[1000D\033[K")
-			red.Printf("%v", e)
+			red.Printf("%v\n", e)
 		}
-		fmt.Printf("\n%s> ", Prompt)
+
+		fmt.Printf("%s> ", Prompt)
 	}
 }
 
