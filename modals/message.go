@@ -49,9 +49,9 @@ type Message struct {
 	// NewChatPhoto is the updated chat photo
 	NewChatPhoto uint64 `json:"new_chat_photo,omitempty"`
 	// DeleteChatPhoto is a service message, true when photo is deleted
-	DeleteChatPhoto *bool `json:"delete_chat_photo,omitempty"`
+	DeleteChatPhoto bool `json:"delete_chat_photo,omitempty"`
 	// NewChatCreated is a service message, true when new group is created
-	NewChatCreated *bool `json:"new_chat_created,omitempty"`
+	NewChatCreated bool `json:"new_chat_created,omitempty"`
 }
 
 func (m *Message) Log(chat *Chat, from *User) {

@@ -33,10 +33,12 @@ func (h *Handler) Start() {
 		if u.ID == 0 {
 			continue
 		}
-		if u.Message != nil {
-			h.Logger.LogMessage() <- u.Message
-			if u.Message.NewChatCreated != nil {
+		if mess := u.Message; mess != nil {
+			h.Logger.LogMessage() <- mess
+			if mess.NewChatCreated {
 				h.Logger.LogNewChat() <- u.Chat
+			} else if mess.NewChatMember != 0 {
+
 			}
 		}
 	}

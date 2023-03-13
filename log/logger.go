@@ -14,26 +14,29 @@ type ChatLogger interface {
 	StartLogging()
 	LogMessage() chan *modals.Message
 	LogNewChat() chan *modals.Chat
+	LogNewMember() chan *modals.Message
 	LogError() chan string
 }
 
-type MyChatLogger struct {
-	Messages chan *modals.Message
-	NewChat  chan *modals.Chat
-	Error    chan string
-	Data     data.Handler
+type chatLogger struct {
+	Messages  chan *modals.Message
+	NewMember chan *modals.Message
+	NewChat   chan *modals.Chat
+	Error     chan string
+	Data      data.Handler
 }
 
 func NewChatLogger(data data.Handler) ChatLogger {
-	return &MyChatLogger{
-		Messages: make(chan *modals.Message, 100),
-		NewChat:  make(chan *modals.Chat, 20),
-		Error:    make(chan string, 10),
-		Data:     data,
+	return &chatLogger{
+		Messages:  make(chan *modals.Message, 100),
+		NewChat:   make(chan *modals.Chat, 20),
+		NewMember: make(chan *modals.Message, 20),
+		Error:     make(chan string, 10),
+		Data:      data,
 	}
 }
 
-func (c *MyChatLogger) StartLogging() {
+func (c *chatLogger) StartLogging() {
 	blue := color.FgBlue
 	red := color.FgRed
 
@@ -45,26 +48,34 @@ func (c *MyChatLogger) StartLogging() {
 
 		case c := <-c.NewChat:
 			fmt.Print("\033[1000D\033[K")
-			blue.Light().Printf("New Chat - %s ", c.Title)
+			blue.Light().Printf("- New Chat : %s ", c.Title)
 			fmt.Printf("(id:%d)\n", c.ID)
 
 		case e := <-c.Error:
 			fmt.Print("\033[1000D\033[K")
 			red.Printf("%v\n", e)
+
+		case m := <-c.NewMember:
+			fmt.Print("\033[1000D\033[K")
+			blue.Printf("- New Member : %s@(%s)", c.Data.GetUser(m.NewChatMember).Username, c.Data.GetChat(m.Chat).Title)
 		}
 
 		fmt.Printf("%s> ", Prompt)
 	}
 }
 
-func (c *MyChatLogger) LogMessage() chan *modals.Message {
+func (c *chatLogger) LogMessage() chan *modals.Message {
 	return c.Messages
 }
 
-func (c *MyChatLogger) LogNewChat() chan *modals.Chat {
+func (c *chatLogger) LogNewChat() chan *modals.Chat {
 	return c.NewChat
 }
 
-func (c *MyChatLogger) LogError() chan string {
+func (c *chatLogger) LogNewMember() chan *modals.Message {
+	return c.NewMember
+}
+
+func (c *chatLogger) LogError() chan string {
 	return c.Error
 }
