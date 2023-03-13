@@ -50,12 +50,8 @@ type Message struct {
 	NewChatPhoto uint64 `json:"new_chat_photo,omitempty"`
 	// DeleteChatPhoto is a service message, true when photo is deleted
 	DeleteChatPhoto *bool `json:"delete_chat_photo,omitempty"`
-	// GroupChatCreated is a service message, true when new group is created
-	GroupChatCreated *bool `json:"group_chat_created,omitempty"`
-	// VideoChatStarted is service message, true when video chat is started
-	VideoChatStarted *bool `json:"video_chat_started,omitempty"`
-	// VideoChatEnded is service message, true when video chat is ended
-	VideoChatEnded *bool `json:"video_chat_ended,omitempty"`
+	// NewChatCreated is a service message, true when new group is created
+	NewChatCreated *bool `json:"new_chat_created,omitempty"`
 }
 
 func (m *Message) Log(chat *Chat, from *User) {

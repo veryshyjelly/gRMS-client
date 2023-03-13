@@ -28,14 +28,14 @@ type Client interface {
 }
 
 func NewClient(username, password string) Client {
-	return &MyClient{
+	return &client{
 		Username: username,
 		Password: password,
 		Updates:  make(chan modals.Update, 100),
 	}
 }
 
-type MyClient struct {
+type client struct {
 	Username string
 	Password string
 	Debug    bool
@@ -43,7 +43,7 @@ type MyClient struct {
 	Conn     *websocket.Conn
 }
 
-func (c *MyClient) Connect(host, path string) (err error) {
+func (c *client) Connect(host, path string) (err error) {
 	URL := url.URL{Scheme: "ws", Host: host, Path: "ws",
 		RawQuery: fmt.Sprintf("username=%s&password=%s", c.Username, c.Password)}
 	c.Conn, _, err = websocket.DefaultDialer.Dial(URL.String(), nil)
@@ -62,17 +62,17 @@ func (c *MyClient) Connect(host, path string) (err error) {
 	}
 }
 
-func (c *MyClient) GetUpdatesChan() chan modals.Update {
+func (c *client) GetUpdatesChan() chan modals.Update {
 	return c.Updates
 }
 
-func (c *MyClient) GetSelf() error {
+func (c *client) GetSelf() error {
 	var req = modals.Req{
 		GetSelf: 1,
 	}
 	return c.Conn.WriteJSON(req)
 }
 
-func (c *MyClient) Close() error {
+func (c *client) Close() error {
 	return c.Conn.Close()
 }

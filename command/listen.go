@@ -13,7 +13,7 @@ import (
 	"github.com/gookit/color"
 )
 
-func Listen(c client.Client, d data.DataHandler) {
+func Listen(c client.Client, d data.Handler) {
 	var reader = bufio.NewReader(os.Stdin)
 	yellow := color.FgYellow
 	blue := color.FgBlue

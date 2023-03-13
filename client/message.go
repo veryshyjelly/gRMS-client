@@ -5,7 +5,7 @@ import (
 	"gRMS-client/modals"
 )
 
-func (c *MyClient) SendMessage(chatId uint64, text string, replyId uint64) error {
+func (c *client) SendMessage(chatId uint64, text string, replyId uint64) error {
 	return c.Conn.WriteJSON(modals.Req{
 		Message: &modals.MessQuery{
 			ChatID:           chatId,
@@ -15,7 +15,7 @@ func (c *MyClient) SendMessage(chatId uint64, text string, replyId uint64) error
 	})
 }
 
-func (c *MyClient) SendMedia(chatId uint64, fileId uint64, fileType string, replyId uint64) error {
+func (c *client) SendMedia(chatId uint64, fileId uint64, fileType string, replyId uint64) error {
 	var req = modals.Req{
 		Message: &modals.MessQuery{
 			ChatID: chatId,
@@ -40,7 +40,7 @@ func (c *MyClient) SendMedia(chatId uint64, fileId uint64, fileType string, repl
 	return c.Conn.WriteJSON(req)
 }
 
-func (c *MyClient) ForwardMessage(fromChatId uint64, messId uint64, toChatId uint64) error {
+func (c *client) ForwardMessage(fromChatId uint64, messId uint64, toChatId uint64) error {
 	var req = modals.Req{
 		ForwardMessage: &modals.ForwardQuery{
 			ToChatId:   toChatId,
@@ -51,6 +51,6 @@ func (c *MyClient) ForwardMessage(fromChatId uint64, messId uint64, toChatId uin
 	return c.Conn.WriteJSON(req)
 }
 
-func (c *MyClient) DeleteMessage(chatId uint64, messId uint64) error {
+func (c *client) DeleteMessage(chatId uint64, messId uint64) error {
 	return nil
 }
