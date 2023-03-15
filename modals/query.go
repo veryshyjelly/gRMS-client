@@ -7,11 +7,18 @@ type Req struct {
 	ChatKick       *UserQuery    `json:"kick_user"`
 	Promote        *UserQuery    `json:"promote"`
 	Demote         *UserQuery    `json:"demote"`
+	ChangeTitle    *ChatQuery    `json:"change_title"`
 	GetUser        uint64        `json:"get_user"`
 	GetChat        uint64        `json:"get_chat"`
 	GetSelf        uint64        `json:"get_self"`
 	LeaveChat      uint64        `json:"leave_chat"`
 	ForwardMessage *ForwardQuery `json:"forward"`
+}
+
+type ChatQuery struct {
+	ChatId         uint64 `json:"chat_id"`
+	NewTitle       string `json:"title"`
+	NewDescription string `json:"description"`
 }
 
 type MessQuery struct {
