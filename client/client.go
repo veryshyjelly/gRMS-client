@@ -17,8 +17,11 @@ type Client interface {
 	CreateChat(title string, participants []string) error
 	AddToChat(chatId uint64, usernames []string) error
 	RemoveFromChat(chatId uint64, usernames []string) error
+	PromoteUsers(chatId uint64, usernames []string) error
+	DemoteUsers(chatId uint64, usernames []string) error
 	LeaveChat(chatId uint64) error // Leave chat should not work in dms
 	GetChat(chatId uint64) error
+	UpdateChatTitle(chatId uint64, newTitle string) error
 	GetUser(userId uint64) error
 	GetSelf() error
 	GetUpdatesChan() chan modals.Update

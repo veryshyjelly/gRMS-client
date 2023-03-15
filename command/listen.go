@@ -6,6 +6,7 @@ import (
 	"gRMS-client/client"
 	"gRMS-client/data"
 	logger "gRMS-client/log"
+	"github.com/manifoldco/promptui"
 	"os"
 	"strconv"
 	"strings"
@@ -56,6 +57,7 @@ func Listen(c client.Client, d data.Handler) {
 
 			if chat := d.GetChat(chatID); chat != nil {
 				logger.Prompt = blue.Sprint("(" + chat.Title + ")")
+			CHATLOOP:
 				for {
 					fmt.Printf("%s> ", logger.Prompt)
 					text := GetString(reader)
@@ -90,12 +92,59 @@ func Listen(c client.Client, d data.Handler) {
 								m.Log(chat, d.GetUser(m.From))
 							}
 
+						} else if command[0] == "" {
+							fmt.Print("\033[A\033[K")
+
+							prompt := promptui.Select{
+								Label:    "Options",
+								HideHelp: true,
+								Items: []string{"Change Title", "Add Participants",
+									"Remove Participant", "Invite via link", "Promote to Admin", "Dismiss as Admin", "Go to Home"},
+							}
+							x, _, err := prompt.Run()
+							if err != nil {
+								red.Printf("error while selecting %v", err)
+							}
+
+							switch x {
+							case 0:
+								blue.Light().Print("Title: ")
+								var title string
+								for title == "" {
+									title = GetString(reader)
+								}
+								c.UpdateChatTitle(chatID, title)
+							case 1:
+								cyan.Print("Enter usernames to add: ")
+								usernames := GetString(reader)
+								c.AddToChat(chatID, strings.Split(usernames, " "))
+							case 2:
+								cyan.Print("Enter username to kick: ")
+								usernames := GetString(reader)
+								c.RemoveFromChat(chatID, strings.Split(usernames, " "))
+							case 3:
+								break
+							case 4:
+								cyan.Print("Enter username to promote: ")
+								usernames := GetString(reader)
+								c.PromoteUsers(chatID, strings.Split(usernames, " "))
+							case 5:
+								cyan.Print("Enter username to demote: ")
+								usernames := GetString(reader)
+								c.DemoteUsers(chatID, strings.Split(usernames, " "))
+							default:
+								break CHATLOOP
+							}
+
+							//fmt.Println(x)
 						} else if command[0] == "help" {
 							helpline := strings.Builder{}
 
 							helpline.WriteString(yellow.Sprintf(">back (go back from this chat)\n"))
 							helpline.WriteString(yellow.Sprintf(">add <list of usernames> (add users to the chat)\n"))
+							helpline.WriteString(yellow.Sprintf(">history <amount> (show history)\n"))
 							helpline.WriteString(yellow.Sprintf(">help (displays this message)\n"))
+							helpline.WriteString(yellow.Sprintf("> (chat settings)"))
 
 							fmt.Print(helpline.String())
 						}
@@ -115,8 +164,6 @@ func Listen(c client.Client, d data.Handler) {
 			}
 			cyan.Print("enter the usernames to add: ")
 			usernames := GetString(reader)
-			usernames = strings.ReplaceAll(usernames, "\n", "")
-
 			c.CreateChat(title, strings.Split(usernames, " "))
 		} else if command == "exit" {
 			c.Close()
