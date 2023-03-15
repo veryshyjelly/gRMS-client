@@ -21,10 +21,10 @@ type MyChatLogger struct {
 	Messages chan *modals.Message
 	NewChat  chan *modals.Chat
 	Error    chan string
-	Data     data.DataHandler
+	Data     data.Handler
 }
 
-func NewChatLogger(data data.DataHandler) ChatLogger {
+func NewChatLogger(data data.Handler) ChatLogger {
 	return &MyChatLogger{
 		Messages: make(chan *modals.Message, 100),
 		NewChat:  make(chan *modals.Chat, 20),

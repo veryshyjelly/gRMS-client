@@ -9,7 +9,7 @@ import (
 type UpdatesHandler struct {
 	Updates chan modals.Update
 	Logger  logger.ChatLogger
-	Data    data.DataHandler
+	Data    data.Handler
 }
 
 func (h *UpdatesHandler) Start() {
@@ -42,7 +42,7 @@ func (h *UpdatesHandler) Start() {
 	}
 }
 
-func NewUpdatesHandler(updates chan modals.Update, l logger.ChatLogger, data data.DataHandler) *UpdatesHandler {
+func NewUpdatesHandler(updates chan modals.Update, l logger.ChatLogger, data data.Handler) *UpdatesHandler {
 	return &UpdatesHandler{
 		Updates: updates,
 		Logger:  l,
