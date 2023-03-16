@@ -137,6 +137,11 @@ func Listen(c client.Client, d data.Handler) {
 							}
 
 							//fmt.Println(x)
+						} else if command[0] == "admins" {
+							for _, v := range chat.Admins {
+								cyan.Printf("- %v\n", d.GetUser(v.UserID).Username)
+							}
+
 						} else if command[0] == "help" {
 							helpline := strings.Builder{}
 
