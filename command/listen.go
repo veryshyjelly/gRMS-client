@@ -20,6 +20,7 @@ func Listen(c client.Client, d data.Handler) {
 	blue := color.FgBlue
 	cyan := color.FgCyan
 	red := color.FgRed
+	green := color.FgGreen
 
 	for {
 		var command string
@@ -137,11 +138,33 @@ func Listen(c client.Client, d data.Handler) {
 							}
 
 							//fmt.Println(x)
+						} else if command[0] == "members" {
+							cyan.Println("Members:")
+							for _, v := range chat.Members {
+								green.Light().Printf("  - %v\n", d.GetUser(v.UserID).Username)
+							}
 						} else if command[0] == "admins" {
+							cyan.Println("Admins:")
 							for _, v := range chat.Admins {
-								cyan.Printf("- %v\n", d.GetUser(v.UserID).Username)
+								green.Light().Printf("  - %v\n", d.GetUser(v.UserID).Username)
+							}
+						} else if command[0] == "leave" {
+							prompt := promptui.Select{Label: "Confirm exit?",
+								HideHelp: true, Items: []string{"YES", "NO"},
+							}
+							_, result, err := prompt.Run()
+							if err != nil {
+								red.Printf("error while selecting %v", err)
 							}
 
+							if result == "YES" {
+								c.LeaveChat(chatID)
+								break
+							}
+						} else if command[0] == "rf" {
+							c.GetChat(chatID)
+							chat = d.GetChat(chatID)
+							logger.Prompt = chat.Title
 						} else if command[0] == "help" {
 							helpline := strings.Builder{}
 
